@@ -1,0 +1,15 @@
+{
+  "$schema": "../open-ams-contract/spec/project.schema.json",
+  "ams": "latest",
+  "group": "io.github.lexa-diky.ams",
+  "name": "sample-project",
+  "version": "0.0.1-RC",
+  "dependencies": [
+    "ams:std:packaged"
+  ],
+  "targets": [
+    { 
+      "compiler": "kotlin" 
+    }, 
+    { "compiler": "swift" }]
+}

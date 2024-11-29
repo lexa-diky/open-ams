@@ -1,0 +1,10 @@
+[
+  {
+    "supertype": "integer", // tet
+    "name": "client-id"
+  },
+  {
+    "supertype": "uuid-4",
+    "name": "application-id"
+  }
+]

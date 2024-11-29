@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ams", "group", "name", "version"],
+  "properties": {
+    "ams": {
+      "type": "string"
+    },
+    "group": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "format": "ss"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string"
+          }
+        ]
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["compiler"],
+        "properties": {
+          "compiler": {
+            "type": "string",
+            "enum": ["kotlin", "swift", "dart", "markdown"]
+          }
+        }
+      }
+    }
+  }
+}

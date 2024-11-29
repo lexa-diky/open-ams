@@ -1,0 +1,10 @@
+[package]
+name = "open-ams"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ['open-ams-cli', "open-ams-compiler"]
+
+[dependencies]
+jsonpath-rust = "0.7.3"

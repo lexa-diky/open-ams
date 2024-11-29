@@ -1,0 +1,8 @@
+{
+  "supertype": "string",
+  "name": "phone-number",
+  "description": "mobile or local phone number",
+  "validation": {
+    "regexp": "^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$"
+  }
+}
