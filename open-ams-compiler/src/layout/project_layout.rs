@@ -1,5 +1,6 @@
 use std::{
     f64::NAN,
+    fs::read,
     path::{Path, PathBuf},
 };
 
@@ -35,6 +36,32 @@ impl ProjectLayout {
         layout.root_module.name = name.to_string();
 
         Ok(layout)
+    }
+
+    pub(crate) fn module(&self, name: &str) -> Option<&ProjectModuleLayout> {
+        if (self.root_module.name == name) {
+            return Some(&self.root_module);
+        }
+
+        self.root_module.module(name)
+    }
+
+    pub(crate) fn module_by_path(&self, path: &str) -> Option<&ProjectModuleLayout> {
+        let parts = path
+            .split("/")
+            .filter(|p| !p.is_empty())
+            .collect::<Vec<&str>>();
+
+        if (parts.is_empty()) {
+            return None;
+        }
+
+        let mut root_q: &ProjectModuleLayout = self.module(parts[0])?;
+        for part in &parts[1..] {
+            root_q = root_q.module(part)?;
+        }
+
+        Some(root_q)
     }
 }
 
@@ -75,5 +102,22 @@ impl ProjectModuleLayout {
             children: child_buf,
             name: String::from(abs_path.file_name().unwrap().to_str().unwrap()),
         })
+    }
+
+    pub(crate) fn module(&self, name: &str) -> Option<&ProjectModuleLayout> {
+        if (self.name == name) {
+            return Some(&self);
+        }
+        for child in &self.children {
+            if child.name == name {
+                return Some(child);
+            }
+        }
+
+        None
+    }
+
+    pub(crate) fn definitions(&self) -> &Vec<PathBuf> {
+        return &self.defs;
     }
 }
