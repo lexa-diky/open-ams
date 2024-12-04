@@ -117,6 +117,16 @@ impl AmsJsonParser {
 }
 
 impl AmsJsonValue {
+    pub(crate) fn string(&self, key: &str) -> Option<&str> {
+        if let AmsJsonValue::Object { element, members } = self {
+            let (_, member) = members.get(key)?;
+            if let AmsJsonValue::String { element, value } = member {
+                return Some(value.as_str());
+            }
+        }
+        None
+    }
+
     fn element(&self) -> AmsJsonElement {
         match self {
             AmsJsonValue::Integer { element, value: _ } => element,

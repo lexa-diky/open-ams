@@ -10,11 +10,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let layout = ProjectLayout::scan("../example", "myapp").unwrap();
-        println!(
-            "{:#?}",
-            layout.module_by_path("/types").unwrap()
-                .definitions()
-        )
+        let layout = ProjectLayout::auto_detect("../example").unwrap();
+        println!("{:#?}", layout.module_by_path("myapp/types/documents/"));
     }
 }

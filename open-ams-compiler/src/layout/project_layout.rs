@@ -1,8 +1,11 @@
 use std::{
     f64::NAN,
-    fs::read,
+    fs::{read, File},
+    io::Error,
     path::{Path, PathBuf},
 };
+
+use crate::json::{AmsJson, AmsJsonParserError};
 
 #[derive(Debug)]
 pub(crate) struct ProjectModuleLayout {
@@ -15,21 +18,43 @@ pub(crate) struct ProjectModuleLayout {
 #[derive(Debug)]
 pub(crate) struct ProjectLayout {
     name: String,
+    group: String,
     directory: PathBuf,
     config: PathBuf,
     root_module: ProjectModuleLayout,
 }
 
 impl ProjectLayout {
+    pub(crate) fn auto_detect<T: AsRef<Path>>(directory: T) -> Result<ProjectLayout, Error> {
+        let mut directory_buf = directory.as_ref().to_path_buf();
+        directory_buf.push("ams.json");
+        let json = AmsJson::read(directory_buf).map_err(|e| match e {
+            AmsJsonParserError::Other { message } => Error::other(message),
+            AmsJsonParserError::Io { cause } => cause,
+        })?;
+
+        let json_body = json.as_body();
+        let group = json_body
+            .string("group")
+            .ok_or(Error::other("group is missing in ams.json"))?;
+        let name = json_body
+            .string("name")
+            .ok_or(Error::other("name is missing in ams.json"))?;
+
+        Self::scan(directory, name, group)
+    }
+
     pub(crate) fn scan<T: AsRef<Path>>(
         path: T,
         name: &str,
-    ) -> Result<ProjectLayout, std::io::Error> {
+        group: &str,
+    ) -> Result<ProjectLayout, Error> {
         let root = std::path::absolute(path)?;
         let mut layout = ProjectLayout {
             name: name.to_string(),
             directory: root.clone(),
             config: root.clone().join("ams.json"),
+            group: group.to_string(),
             root_module: ProjectModuleLayout::scan(&root)?,
         };
 
@@ -66,7 +91,7 @@ impl ProjectLayout {
 }
 
 impl ProjectModuleLayout {
-    pub(crate) fn scan<T: AsRef<Path>>(path: T) -> Result<ProjectModuleLayout, std::io::Error> {
+    pub(crate) fn scan<T: AsRef<Path>>(path: T) -> Result<ProjectModuleLayout, Error> {
         let abs_path = std::path::absolute(path)?;
 
         let walk = walkdir::WalkDir::new(abs_path.clone())
@@ -96,11 +121,12 @@ impl ProjectModuleLayout {
             child_buf.push(Self::scan(ch)?);
         }
 
+        let name = abs_path.file_name().unwrap().to_str().unwrap();
         Ok(ProjectModuleLayout {
             directory: abs_path.to_path_buf(),
             defs: defs_buf,
             children: child_buf,
-            name: String::from(abs_path.file_name().unwrap().to_str().unwrap()),
+            name: name.to_string(),
         })
     }
 
