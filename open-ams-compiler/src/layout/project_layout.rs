@@ -88,6 +88,12 @@ impl ProjectLayout {
 
         Some(root_q)
     }
+
+    pub(crate) fn manifest_path(&self) -> PathBuf {
+        let mut buf = self.directory.to_path_buf();
+        buf.push("ams.json");
+        buf
+    }
 }
 
 impl ProjectModuleLayout {

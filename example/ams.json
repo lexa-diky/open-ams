@@ -5,7 +5,7 @@
   "name": "myapp",
   "version": "0.0.1-RC",
   "dependencies": [
-    "ams:std:packaged"
+    "ams:std:bundeled"
   ],
   "targets": [
     {
