@@ -1,0 +1,19 @@
+definitions:
+  types:
+    Integer:
+      type: NativeBinding
+      nativeBindings:
+        kotlin: kotlin.Int
+        java: java.lang.Integer
+        swift: Int
+        dart: int
+    Float:
+      type: NativeBinding
+      nativeBindings:
+        kotlin: kotlin.Double
+        java: java.lang.Double
+        swift: Double
+        dart: double
+    Number:
+      type: Alias
+      alias: Float

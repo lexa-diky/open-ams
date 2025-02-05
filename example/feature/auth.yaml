@@ -1,0 +1,18 @@
+module: common
+uses:
+  - ams:std/*
+  - self/common/*
+
+definitions:
+  components:
+    PhoneLoginPage:
+      type: page
+      events:
+        OnLogin:
+          parameters:
+            phone:
+              type: PhoneNumber
+            passcode:
+              type: String
+  events:
+    UserLoggedIn:

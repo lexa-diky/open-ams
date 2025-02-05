@@ -1,0 +1,9 @@
+definitions:
+  types:
+    String:
+      type: NativeBinding
+      nativeBindings:
+        kotlin: kotlin.String
+        java: java.lang.String
+        swift: String
+        dart: String
