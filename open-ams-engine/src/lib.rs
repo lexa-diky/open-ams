@@ -1,6 +1,7 @@
 mod assets;
 pub mod entity;
 pub mod resolver;
+mod util;
 
 pub(crate) use assets::Assets;
 

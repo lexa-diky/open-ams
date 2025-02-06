@@ -20,11 +20,11 @@ pub enum DeclarationReference {
     },
 }
 impl DeclarationReference {
-    pub fn fully_qualified(project_ref: ProjectReference, module: EPath, name: String) -> Self {
+    pub fn fully_qualified(project_ref: ProjectReference, module: EPath, name: &str) -> Self {
         DeclarationReference::FullyQualified {
             project_ref,
             module,
-            name,
+            name: name.to_string(),
         }
     }
 
@@ -112,7 +112,7 @@ impl FromStr for DeclarationReference {
                     .parse()
                     .map_err(|_| DeclarationReferenceError::InvalidProjectReference)?,
                 EPath::empty(),
-                parts[1].to_string(),
+                parts[1],
             )),
             _ if parts.len() >= 3 => {
                 let project_ref = parts[0]
@@ -124,7 +124,7 @@ impl FromStr for DeclarationReference {
                 } else {
                     EPath::new(module_parts.iter().map(|s| s.to_string()).collect())
                 };
-                let name = parts[parts.len() - 1].to_string();
+                let name = parts[parts.len() - 1];
                 Ok(DeclarationReference::fully_qualified(
                     project_ref,
                     module,
@@ -145,12 +145,9 @@ mod tests {
     fn test_fully_qualified_to_string() {
         let project_ref = ProjectReference::external("group", "name");
         let module = EPath::new(vec!["module1".to_string()]);
-        let name = "name1".to_string();
-        let decl_ref = DeclarationReference::fully_qualified(
-            project_ref.clone(),
-            module.clone(),
-            name.clone(),
-        );
+        let name = "name1";
+        let decl_ref =
+            DeclarationReference::fully_qualified(project_ref.clone(), module.clone(), name);
         assert_eq!(
             decl_ref.to_string(),
             format!(
@@ -175,7 +172,7 @@ mod tests {
         let decl_ref = s.parse::<DeclarationReference>().unwrap();
         let project_ref = ProjectReference::from_str("group:name").unwrap();
         let module = EPath::new(vec!["module1".to_string()]);
-        let name = "name1".to_string();
+        let name = "name1";
         assert_eq!(
             decl_ref,
             DeclarationReference::fully_qualified(project_ref, module, name)
@@ -204,12 +201,9 @@ mod tests {
     fn test_serialize_fully_qualified_yaml() {
         let project_ref = ProjectReference::external("group", "name");
         let module = EPath::new(vec!["module1".to_string()]);
-        let name = "name1".to_string();
-        let decl_ref = DeclarationReference::fully_qualified(
-            project_ref.clone(),
-            module.clone(),
-            name.clone(),
-        );
+        let name = "name1";
+        let decl_ref =
+            DeclarationReference::fully_qualified(project_ref.clone(), module.clone(), name);
         let serialized = serde_yaml::to_string(&decl_ref).unwrap();
         assert_eq!(
             serialized.trim(),

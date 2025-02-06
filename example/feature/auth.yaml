@@ -14,5 +14,10 @@ definitions:
               type: PhoneNumber
             passcode:
               type: String
+      children:
+        LogingButton:
+          type: widget
+          events:
+            - OnClick
   events:
     UserLoggedIn:
