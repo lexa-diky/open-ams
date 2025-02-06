@@ -1,4 +1,4 @@
-use crate::entity::Environment;
+use crate::source::entity::Environment;
 
 #[derive(Debug)]
 pub struct Resolver<'env> {

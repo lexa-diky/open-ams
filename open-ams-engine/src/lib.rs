@@ -1,6 +1,6 @@
 mod assets;
-pub mod entity;
 pub mod resolver;
+pub mod source;
 mod util;
 
 pub(crate) use assets::Assets;
@@ -11,7 +11,7 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::{entity::Environment, resolver::Resolver};
+    use crate::{resolver::Resolver, source::entity::Environment};
 
     #[test]
     fn test_example() {
@@ -19,7 +19,7 @@ mod tests {
         environment.load_local("./../example").unwrap();
         environment.set_target_project(environment.projects()[1].identifier());
 
-        let resolver = Resolver::of(&environment).form_target_project();
+        let resolver = Resolver::of(&environment);
 
         println!("{:#?}", resolver);
     }
