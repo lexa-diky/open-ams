@@ -1,4 +1,5 @@
-use super::{DependencyReference, ProjectIdentifier, ProjectReference, Version};
+use super::{DependencyReference, Version};
+use crate::entity::ProjectIdentifier;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -19,7 +20,7 @@ impl Manifest {
     ) -> Self {
         Manifest {
             group: group.to_string(),
-            name: group.to_string(),
+            name: name.to_string(),
             version,
             dependencies,
         }

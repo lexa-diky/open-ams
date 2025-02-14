@@ -4,11 +4,11 @@ use crate::Assets;
 use serde::de::{DeserializeOwned, Error};
 use thiserror::Error;
 use walkdir::WalkDir;
-
-use super::{Manifest, ModuleFragment, ProjectIdentifier, ProjectReference};
+use crate::entity::ProjectIdentifier;
+use super::{Manifest, ModuleFragment};
 
 #[derive(Debug)]
-pub struct Project {
+pub struct SourceProject {
     manifest: Manifest,
     modules: Vec<ModuleFragment>,
 }
@@ -16,25 +16,25 @@ pub struct Project {
 #[derive(Debug, Error)]
 pub enum ProjectLoadingError {
     #[error("Manifest file 'ams' not found in the project files")]
-    ManifestNotFould,
+    ManifestNotFound,
 }
 
-impl Project {
+impl SourceProject {
     pub fn new(manifest: Manifest, modules: Vec<ModuleFragment>) -> Self {
-        Project { manifest, modules }
+        SourceProject { manifest, modules }
     }
 
     pub fn identifier(&self) -> ProjectIdentifier {
         self.manifest.identifier()
     }
 
-    pub fn from_asset(folder_path: &str) -> Result<Project, ProjectLoadingError> {
+    pub fn from_asset(folder_path: &str) -> Result<SourceProject, ProjectLoadingError> {
         let mut project_filess = Assets::iter().filter(|path| path.starts_with(folder_path));
 
         let manifest = project_filess
             .find(|path| path.ends_with("ams.yaml"))
             .map((|path| Self::read_from_assets::<Manifest>(path.as_ref())))
-            .ok_or(ProjectLoadingError::ManifestNotFould)?
+            .ok_or(ProjectLoadingError::ManifestNotFound)?
             .unwrap();
 
         let modules: Vec<ModuleFragment> = project_filess
@@ -42,10 +42,10 @@ impl Project {
             .map((|path| Self::read_from_assets::<ModuleFragment>(path.as_ref()).unwrap()))
             .collect();
 
-        Ok(Project::new(manifest, modules))
+        Ok(SourceProject::new(manifest, modules))
     }
 
-    pub fn from_path<T: AsRef<Path>>(path: T) -> Result<Project, ProjectLoadingError> {
+    pub fn from_path<T: AsRef<Path>>(path: T) -> Result<SourceProject, ProjectLoadingError> {
         let entries: Vec<walkdir::DirEntry> = WalkDir::new(path)
             .into_iter()
             .filter_map(|entry| entry.ok())
@@ -57,10 +57,10 @@ impl Project {
             .iter()
             .find(|entry| entry.path().ends_with("ams.yaml"))
             .map((|entry| Self::read_from_files::<Manifest>(entry.path().as_ref())))
-            .ok_or(ProjectLoadingError::ManifestNotFould)
+            .ok_or(ProjectLoadingError::ManifestNotFound)
             .unwrap();
 
-        Ok(Project::new(
+        Ok(SourceProject::new(
             manifest.unwrap(),
             entries
                 .iter()

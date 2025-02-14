@@ -1,14 +1,12 @@
-use std::{fs::File, path::Path, vec};
+use std::{path::Path, vec};
 
-use super::{
-    dependency, DependencyReference, Project, ProjectIdentifier, ProjectLoadingError,
-    ProjectReference,
-};
+use super::{SourceProject, ProjectLoadingError};
+use crate::entity::ProjectIdentifier;
 use thiserror::Error;
 
 #[derive(Debug)]
-pub struct Environment {
-    projects: Vec<Project>,
+pub struct SourceEnvironment {
+    projects: Vec<SourceProject>,
     target_project: Option<ProjectIdentifier>,
 }
 
@@ -21,11 +19,11 @@ pub enum EnvironmentInitializationError {
     ProjectDublicated { project_name: String },
 }
 
-impl Environment {
+impl SourceEnvironment {
     pub fn default() -> Result<Self, EnvironmentInitializationError> {
-        let stdlib = Project::from_asset("stdlib")?;
+        let stdlib = SourceProject::from_asset("stdlib")?;
 
-        Ok(Environment {
+        Ok(SourceEnvironment {
             projects: vec![stdlib],
             target_project: None,
         })
@@ -35,7 +33,7 @@ impl Environment {
         &mut self,
         path: P,
     ) -> Result<(), EnvironmentInitializationError> {
-        let project = Project::from_path(path)?;
+        let project = SourceProject::from_path(path)?;
 
         if self
             .projects
@@ -56,7 +54,7 @@ impl Environment {
         self.target_project = Some(identifier);
     }
 
-    pub fn projects(&self) -> &Vec<Project> {
+    pub fn projects(&self) -> &Vec<SourceProject> {
         &self.projects
     }
 

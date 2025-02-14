@@ -1,11 +1,19 @@
-#[derive(Debug, Clone, PartialEq, Eq)]
+use std::fmt;
+
+#[derive(Eq, PartialEq)]
 pub struct ProjectIdentifier {
     group: String,
     name: String,
 }
 
-impl std::fmt::Display for ProjectIdentifier {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ProjectIdentifier {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}:{}", self.group, self.name)
+    }
+}
+
+impl fmt::Debug for ProjectIdentifier {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}:{}", self.group, self.name)
     }
 }
