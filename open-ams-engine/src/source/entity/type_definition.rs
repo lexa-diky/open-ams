@@ -20,8 +20,7 @@ pub struct SourceTypeDefinition {
 #[derive(Debug, PartialEq)]
 pub enum TypeDefinitionTypeReference {
     NativeBinding,
-    Alias,
-    Declaration(DeclarationReference),
+    Alias(DeclarationReference),
 }
 
 impl SourceTypeDefinition {
@@ -37,8 +36,7 @@ impl Serialize for TypeDefinitionTypeReference {
     {
         match self {
             TypeDefinitionTypeReference::NativeBinding => serializer.serialize_str("NativeBinding"),
-            TypeDefinitionTypeReference::Alias => serializer.serialize_str("Alias"),
-            TypeDefinitionTypeReference::Declaration(decl) => decl.serialize(serializer),
+            TypeDefinitionTypeReference::Alias(decl) => decl.serialize(serializer),
         }
     }
 }
@@ -63,8 +61,7 @@ impl<'de> Deserialize<'de> for TypeDefinitionTypeReference {
             {
                 match value {
                     "NativeBinding" => Ok(TypeDefinitionTypeReference::NativeBinding),
-                    "Alias" => Ok(TypeDefinitionTypeReference::Alias),
-                    _ => Ok(TypeDefinitionTypeReference::Declaration(
+                    _ => Ok(TypeDefinitionTypeReference::Alias(
                         DeclarationReference::from_str(value).map_err(|e| de::Error::custom(e))?,
                     )),
                 }
