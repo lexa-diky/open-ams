@@ -1,5 +1,6 @@
 use crate::source::entity::{
-    SourceEnvironment, SourceModuleFragment, SourceProject, SourceTypeDefinition,
+    DeclarationReference, SourceEnvironment, SourceModuleFragment, SourceProject,
+    SourceTypeDefinition, TypeDefinitionTypeReference,
 };
 use thiserror::Error;
 
@@ -70,16 +71,46 @@ impl<'env> Resolver<'env> {
             project.identifier(),
             module.path().extended(type_name.as_str()),
         );
-        
-        if !type_definition.native_bindings().is_empty() {
-            context.push_type_definition(TypeDefinition::new_native_binding(
-                identifier,
-                type_definition.native_bindings(),
-            ));
-            return;
+
+        match type_definition.type_ref() {
+            TypeDefinitionTypeReference::NativeBinding => {
+                context.push_type_definition(TypeDefinition::new_native_binding(
+                    identifier,
+                    type_definition.native_bindings(),
+                ));
+            }
+            TypeDefinitionTypeReference::Alias(declaration_ref) => {
+                context.push_type_definition(TypeDefinition::new_alias(
+                    identifier.clone(),
+                    self.resolve_type_identifier(context, project, module, declaration_ref),
+                ));
+            }
         }
-        
-        if !type_definition.native_bindings().is_empty() {}
+    }
+
+    fn resolve_type_identifier(
+        &self,
+        context: &Environment,
+        project: &SourceProject,
+        module: &SourceModuleFragment,
+        declaration_ref: &DeclarationReference,
+    ) -> TypeDefinitionIdentifier {
+        match declaration_ref {
+            DeclarationReference::FullyQualified {
+                project_ref,
+                module,
+                name,
+            } => {
+                let project = project_ref.identifier(project);
+                TypeDefinitionIdentifier::new(
+                    project,
+                    module.extended(name.as_str()),
+                )
+            }
+            DeclarationReference::Local { .. } => {
+               TypeDefinitionIdentifier::undefined()
+            }
+        }
     }
 }
 

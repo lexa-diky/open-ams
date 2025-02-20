@@ -1,6 +1,8 @@
+use crate::entity::ProjectIdentifier;
+use crate::source::entity::SourceProject;
 use serde::de::{self, Visitor};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::fmt::{self, Debug};
+use std::fmt::{self, Debug, Display};
 use std::str::FromStr;
 
 #[derive(PartialEq, Clone)]
@@ -29,20 +31,28 @@ impl ProjectReference {
             name: name.to_string(),
         }
     }
+
+    pub fn identifier(&self, current: &SourceProject) -> ProjectIdentifier {
+        match self {
+            ProjectReference::CurrentProject => current.identifier(),
+            ProjectReference::External { group, name } => ProjectIdentifier::new(group, name),
+        }
+    }
 }
 
 #[derive(Debug, Clone, thiserror::Error)]
 #[error("invalid project reference")]
 pub struct ParseProjectReferenceError;
 
-impl ToString for ProjectReference {
-    fn to_string(&self) -> String {
-        match self {
+impl Display for ProjectReference {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match self {
             ProjectReference::CurrentProject => "self".to_string(),
             ProjectReference::External { group, name } => {
                 format!("{}:{}", group, name)
             }
-        }
+        };
+        write!(f, "{}", str)
     }
 }
 

@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct ProjectIdentifier {
     group: String,
     name: String,

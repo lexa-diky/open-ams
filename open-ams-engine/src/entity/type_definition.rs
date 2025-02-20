@@ -3,7 +3,9 @@ use crate::entity::ProjectIdentifier;
 use crate::source::entity::TargetLanguage;
 use std::collections::HashMap;
 use std::fmt::{Debug, Formatter};
+use uuid::{uuid, Uuid};
 
+#[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct TypeDefinitionIdentifier {
     project: ProjectIdentifier,
     path: EPath,
@@ -12,6 +14,14 @@ pub struct TypeDefinitionIdentifier {
 impl TypeDefinitionIdentifier {
     pub fn new(project: ProjectIdentifier, path: EPath) -> Self {
         TypeDefinitionIdentifier { project, path }
+    }
+
+    pub fn undefined() -> Self {
+        let uuid = Uuid::new_v4().to_string();
+        TypeDefinitionIdentifier::new(
+            ProjectIdentifier::new("undefined", "undefined"),
+            EPath::new(vec![uuid]),
+        )
     }
 }
 
@@ -36,6 +46,7 @@ pub struct AliasTypeDefinition {
 #[derive(Debug)]
 pub enum TypeDefinition {
     NativeBinding(NativeBindingTypeDefinition),
+    Alias(AliasTypeDefinition),
 }
 
 impl TypeDefinition {
@@ -46,6 +57,16 @@ impl TypeDefinition {
         TypeDefinition::NativeBinding(NativeBindingTypeDefinition {
             identifier,
             bindings: bindings.clone(),
+        })
+    }
+
+    pub fn new_alias(
+        identifier: TypeDefinitionIdentifier,
+        aliases: TypeDefinitionIdentifier,
+    ) -> Self {
+        TypeDefinition::Alias(AliasTypeDefinition {
+            identifier,
+            aliases,
         })
     }
 }

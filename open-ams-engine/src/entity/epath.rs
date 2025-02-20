@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use std::str::FromStr;
 use std::string::ParseError;
 
-#[derive(PartialEq, Clone, Eq, Hash)]
+#[derive(Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
 pub struct EPath {
     pub segments: Vec<String>,
 }

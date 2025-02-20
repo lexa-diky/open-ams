@@ -13,7 +13,7 @@ pub struct SourceTypeDefinition {
     type_ref: TypeDefinitionTypeReference,
     pattern: Option<String>,
     example: Option<String>,
-    #[serde(rename = "nativeBindings", default="HashMap::new")]
+    #[serde(rename = "nativeBindings", default = "HashMap::new")]
     native_bindings: HashMap<TargetLanguage, String>,
 }
 
@@ -26,6 +26,10 @@ pub enum TypeDefinitionTypeReference {
 impl SourceTypeDefinition {
     pub fn native_bindings(&self) -> &HashMap<TargetLanguage, String> {
         &self.native_bindings
+    }
+    
+    pub fn type_ref(&self) -> &TypeDefinitionTypeReference {
+        &self.type_ref
     }
 }
 

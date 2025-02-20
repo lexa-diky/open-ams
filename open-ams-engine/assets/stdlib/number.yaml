@@ -15,5 +15,4 @@ definitions:
         swift: Double
         dart: double
     Number:
-      type: Alias
-      alias: Float
+      type: ams:std/Float
