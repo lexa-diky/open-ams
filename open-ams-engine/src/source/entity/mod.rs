@@ -10,7 +10,6 @@ mod module_fragment;
 mod parameter_definition;
 mod project;
 mod project_reference;
-mod target_language;
 mod type_definition;
 mod version;
 
@@ -27,6 +26,6 @@ pub use module_fragment::*;
 pub use parameter_definition::*;
 pub use project::*;
 pub use project_reference::*;
-pub use target_language::*;
+pub use crate::entity::target_language::*;
 pub use type_definition::*;
 pub use version::*;

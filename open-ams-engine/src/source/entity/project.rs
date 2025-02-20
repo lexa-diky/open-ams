@@ -5,12 +5,12 @@ use serde::de::{DeserializeOwned, Error};
 use thiserror::Error;
 use walkdir::WalkDir;
 use crate::entity::ProjectIdentifier;
-use super::{Manifest, ModuleFragment};
+use super::{SourceManifest, SourceModuleFragment};
 
 #[derive(Debug)]
 pub struct SourceProject {
-    manifest: Manifest,
-    modules: Vec<ModuleFragment>,
+    manifest: SourceManifest,
+    modules: Vec<SourceModuleFragment>,
 }
 
 #[derive(Debug, Error)]
@@ -20,12 +20,16 @@ pub enum ProjectLoadingError {
 }
 
 impl SourceProject {
-    pub fn new(manifest: Manifest, modules: Vec<ModuleFragment>) -> Self {
+    pub fn new(manifest: SourceManifest, modules: Vec<SourceModuleFragment>) -> Self {
         SourceProject { manifest, modules }
     }
 
     pub fn identifier(&self) -> ProjectIdentifier {
         self.manifest.identifier()
+    }
+    
+    pub fn modules(&self) -> &[SourceModuleFragment] {
+        self.modules.as_slice()
     }
 
     pub fn from_asset(folder_path: &str) -> Result<SourceProject, ProjectLoadingError> {
@@ -33,13 +37,13 @@ impl SourceProject {
 
         let manifest = project_filess
             .find(|path| path.ends_with("ams.yaml"))
-            .map((|path| Self::read_from_assets::<Manifest>(path.as_ref())))
+            .map((|path| Self::read_from_assets::<SourceManifest>(path.as_ref())))
             .ok_or(ProjectLoadingError::ManifestNotFound)?
             .unwrap();
 
-        let modules: Vec<ModuleFragment> = project_filess
+        let modules: Vec<SourceModuleFragment> = project_filess
             .filter(|path| !path.ends_with("ams.yaml"))
-            .map((|path| Self::read_from_assets::<ModuleFragment>(path.as_ref()).unwrap()))
+            .map((|path| Self::read_from_assets::<SourceModuleFragment>(path.as_ref()).unwrap()))
             .collect();
 
         Ok(SourceProject::new(manifest, modules))
@@ -56,7 +60,7 @@ impl SourceProject {
         let manifest = entries
             .iter()
             .find(|entry| entry.path().ends_with("ams.yaml"))
-            .map((|entry| Self::read_from_files::<Manifest>(entry.path().as_ref())))
+            .map((|entry| Self::read_from_files::<SourceManifest>(entry.path().as_ref())))
             .ok_or(ProjectLoadingError::ManifestNotFound)
             .unwrap();
 
@@ -67,7 +71,7 @@ impl SourceProject {
                 .filter(|entry| !entry.path().ends_with("ams.yaml"))
                 .map(
                     (|entry| {
-                        Self::read_from_files::<ModuleFragment>(entry.path().as_ref()).unwrap()
+                        Self::read_from_files::<SourceModuleFragment>(entry.path().as_ref()).unwrap()
                     }),
                 )
                 .collect(),

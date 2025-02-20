@@ -3,7 +3,7 @@ use crate::entity::ProjectIdentifier;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct Manifest {
+pub struct SourceManifest {
     pub group: String,
     pub name: String,
     pub version: Version,
@@ -11,14 +11,14 @@ pub struct Manifest {
     pub dependencies: Vec<DependencyReference>,
 }
 
-impl Manifest {
+impl SourceManifest {
     pub fn new(
         group: &str,
         name: &str,
         version: Version,
         dependencies: Vec<DependencyReference>,
     ) -> Self {
-        Manifest {
+        SourceManifest {
             group: group.to_string(),
             name: name.to_string(),
             version,
@@ -37,7 +37,7 @@ mod tests {
 
     #[test]
     fn test_manifest_serialization() {
-        let manifest = Manifest::new(
+        let manifest = SourceManifest::new(
             "example_group",
             "example_name",
             Version::new(1, 0, 0),
@@ -58,9 +58,9 @@ mod tests {
     fn test_manifest_deserialization() {
         let yaml =
             "---\ngroup: example_group\nname: example_name\nversion: 1.0.0\ndependencies: []\n";
-        let manifest: Manifest = serde_yaml::from_str(yaml).unwrap();
+        let manifest: SourceManifest = serde_yaml::from_str(yaml).unwrap();
 
-        let expected_manifest = Manifest::new(
+        let expected_manifest = SourceManifest::new(
             "example_group",
             "example_name",
             Version::new(1, 0, 0),

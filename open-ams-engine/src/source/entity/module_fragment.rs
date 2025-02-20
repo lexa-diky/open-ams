@@ -3,10 +3,21 @@ use serde::{Deserialize, Serialize};
 use super::{DeclarationReferenceFilter, EPath, ModuleDefinitions};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct ModuleFragment {
+pub struct SourceModuleFragment {
     #[serde(rename = "module", default = "EPath::empty")]
-    pub path: EPath,
+    path: EPath,
     #[serde(default = "Vec::new")]
-    pub uses: Vec<DeclarationReferenceFilter>,
-    pub definitions: ModuleDefinitions,
+    uses: Vec<DeclarationReferenceFilter>,
+    definitions: ModuleDefinitions,
+}
+
+impl SourceModuleFragment {
+    
+    pub fn definitions(&self) -> &ModuleDefinitions {
+        &self.definitions
+    }
+    
+    pub fn path(&self) -> &EPath {
+        &self.path
+    }
 }

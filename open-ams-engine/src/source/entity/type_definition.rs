@@ -8,13 +8,13 @@ use serde::de::{self, Visitor};
 use serde::{Deserializer, Serializer};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-pub struct TypeDefinition {
+pub struct SourceTypeDefinition {
     #[serde(rename = "type")]
     type_ref: TypeDefinitionTypeReference,
     pattern: Option<String>,
     example: Option<String>,
-    #[serde(rename = "nativeBindings")]
-    native_bindings: Option<HashMap<TargetLanguage, String>>,
+    #[serde(rename = "nativeBindings", default="HashMap::new")]
+    native_bindings: HashMap<TargetLanguage, String>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -22,6 +22,12 @@ pub enum TypeDefinitionTypeReference {
     NativeBinding,
     Alias,
     Declaration(DeclarationReference),
+}
+
+impl SourceTypeDefinition {
+    pub fn native_bindings(&self) -> &HashMap<TargetLanguage, String> {
+        &self.native_bindings
+    }
 }
 
 impl Serialize for TypeDefinitionTypeReference {

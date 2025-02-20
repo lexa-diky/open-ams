@@ -23,6 +23,12 @@ impl EPath {
         EPath { segments }
     }
 
+    pub fn extended(&self, segment: &str) -> Self {
+        let mut clone = self.clone();
+        clone.segments.push(segment.to_string());
+        clone
+    }
+
     pub fn empty() -> Self {
         EPath {
             segments: Vec::new(),

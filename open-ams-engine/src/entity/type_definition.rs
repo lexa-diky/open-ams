@@ -1,7 +1,9 @@
 use crate::entity::epath::EPath;
 use crate::entity::ProjectIdentifier;
+use crate::source::entity::TargetLanguage;
+use std::collections::HashMap;
+use std::fmt::{Debug, Formatter};
 
-#[derive(Debug)]
 pub struct TypeDefinitionIdentifier {
     project: ProjectIdentifier,
     path: EPath,
@@ -13,13 +15,37 @@ impl TypeDefinitionIdentifier {
     }
 }
 
+impl Debug for TypeDefinitionIdentifier {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{:?}", self.project, self.path)
+    }
+}
+
 #[derive(Debug)]
-pub struct TypeDefinition {
-    identifier: TypeDefinitionIdentifier
+pub struct NativeBindingTypeDefinition {
+    identifier: TypeDefinitionIdentifier,
+    bindings: HashMap<TargetLanguage, String>,
+}
+
+#[derive(Debug)]
+pub struct AliasTypeDefinition {
+    identifier: TypeDefinitionIdentifier,
+    aliases: TypeDefinitionIdentifier,
+}
+
+#[derive(Debug)]
+pub enum TypeDefinition {
+    NativeBinding(NativeBindingTypeDefinition),
 }
 
 impl TypeDefinition {
-    pub fn new(identifier: TypeDefinitionIdentifier) -> Self {
-        TypeDefinition { identifier }
+    pub fn new_native_binding(
+        identifier: TypeDefinitionIdentifier,
+        bindings: &HashMap<TargetLanguage, String>,
+    ) -> Self {
+        TypeDefinition::NativeBinding(NativeBindingTypeDefinition {
+            identifier,
+            bindings: bindings.clone(),
+        })
     }
 }
