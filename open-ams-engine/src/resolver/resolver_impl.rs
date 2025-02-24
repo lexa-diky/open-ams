@@ -1,7 +1,4 @@
-use crate::source::entity::{
-    DeclarationReference, SourceEnvironment, SourceModuleFragment, SourceProject,
-    SourceTypeDefinition, TypeDefinitionTypeReference,
-};
+use crate::source::entity::{DeclarationReference, SourceEventDefinition, SourceEnvironment, SourceModuleFragment, SourceProject, SourceTypeDefinition, TypeDefinitionTypeReference};
 use thiserror::Error;
 
 use crate::entity::{Environment, ProjectIdentifier, TypeDefinition, TypeDefinitionIdentifier};
@@ -25,7 +22,7 @@ impl<'env> Resolver<'env> {
         let target_project_name = target_project.name();
         let project_identifier = ProjectIdentifier::new(target_project_group, target_project_name);
 
-        let mut environment = Environment::new(project_identifier, vec![]);
+        let mut environment = Environment::empty(project_identifier);
         let source_projects = self.projects_in_resolution_order()?;
 
         for project in source_projects {

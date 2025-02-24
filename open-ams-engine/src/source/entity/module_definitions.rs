@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use super::{ComponentDefinition, EventDefinition, SourceTypeDefinition};
+use super::{ComponentDefinition, SourceEventDefinition, SourceTypeDefinition};
 use crate::util::custom_deserialize_map_or_seq;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
@@ -15,13 +15,21 @@ pub struct ModuleDefinitions {
         default = "HashMap::new",
         deserialize_with = "custom_deserialize_map_or_seq"
     )]
-    events: HashMap<String, EventDefinition>,
+    events: HashMap<String, SourceEventDefinition>,
 }
 
 impl ModuleDefinitions {
     
     pub fn types(&self) -> &HashMap<String, SourceTypeDefinition> {
         &self.types
+    }
+    
+    pub fn events(&self) -> &HashMap<String, SourceEventDefinition> {
+        &self.events
+    }
+    
+    pub fn components(&self) -> &HashMap<String, ComponentDefinition> {
+        &self.components
     }
     
     pub fn merge_with(&mut self, other: ModuleDefinitions) {

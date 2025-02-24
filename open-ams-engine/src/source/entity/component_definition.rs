@@ -1,6 +1,6 @@
 use std::{collections::HashMap, fmt};
 
-use super::{DeclarationReference, EventDefinition};
+use super::{DeclarationReference, SourceEventDefinition};
 use crate::util::custom_deserialize_map_or_seq;
 use serde::{Deserialize, Serialize};
 
@@ -12,7 +12,7 @@ pub struct ComponentDefinition {
         default = "HashMap::new",
         deserialize_with = "custom_deserialize_map_or_seq"
     )]
-    pub events: HashMap<String, EventDefinition>,
+    pub events: HashMap<String, SourceEventDefinition>,
     #[serde(default = "HashMap::new")]
     pub children: HashMap<String, ComponentDefinition>,
 }
