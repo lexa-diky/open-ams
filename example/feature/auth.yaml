@@ -1,7 +1,4 @@
 module: common
-uses:
-  - ams:std/*
-  - self/common/*
 
 definitions:
   components:

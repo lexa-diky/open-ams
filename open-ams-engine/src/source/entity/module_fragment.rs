@@ -6,8 +6,6 @@ use super::{DeclarationReferenceFilter, EPath, ModuleDefinitions};
 pub struct SourceModuleFragment {
     #[serde(rename = "module", default = "EPath::empty")]
     path: EPath,
-    #[serde(default = "Vec::new")]
-    uses: Vec<DeclarationReferenceFilter>,
     definitions: ModuleDefinitions,
 }
 
@@ -19,5 +17,9 @@ impl SourceModuleFragment {
     
     pub fn path(&self) -> &EPath {
         &self.path
+    }
+    
+    pub fn merge_with(&mut self, other: SourceModuleFragment)  {
+        self.definitions.merge_with(other.definitions)
     }
 }

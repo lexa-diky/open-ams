@@ -1,16 +1,17 @@
 use std::{fs::File, io::BufReader, path::Path};
-
+use std::collections::HashMap;
 use crate::Assets;
 use serde::de::{DeserializeOwned, Error};
 use thiserror::Error;
 use walkdir::WalkDir;
+use crate::entity::epath::EPath;
 use crate::entity::ProjectIdentifier;
 use super::{SourceManifest, SourceModuleFragment};
 
 #[derive(Debug)]
 pub struct SourceProject {
     manifest: SourceManifest,
-    modules: Vec<SourceModuleFragment>,
+    module_fragments: Vec<SourceModuleFragment>,
 }
 
 #[derive(Debug, Error)]
@@ -21,7 +22,7 @@ pub enum ProjectLoadingError {
 
 impl SourceProject {
     pub fn new(manifest: SourceManifest, modules: Vec<SourceModuleFragment>) -> Self {
-        SourceProject { manifest, modules }
+        SourceProject { manifest, module_fragments: modules }
     }
 
     pub fn identifier(&self) -> ProjectIdentifier {
@@ -29,24 +30,41 @@ impl SourceProject {
     }
     
     pub fn modules(&self) -> &[SourceModuleFragment] {
-        self.modules.as_slice()
+        self.module_fragments.as_slice()
+    }
+
+    pub fn compress_module_fragments(&mut self) {
+        let mut buf: HashMap<EPath, SourceModuleFragment> = HashMap::new();
+
+        for module_fragment in self.module_fragments.drain(..) {
+            if let Some(target) = buf.get_mut(module_fragment.path()) {
+                target.merge_with(module_fragment);
+            } else {
+                buf.insert(module_fragment.path().clone(), module_fragment);
+            }
+        }
+
+        self.module_fragments = buf.into_values().collect();
     }
 
     pub fn from_asset(folder_path: &str) -> Result<SourceProject, ProjectLoadingError> {
-        let mut project_filess = Assets::iter().filter(|path| path.starts_with(folder_path));
+        let mut project_files = Assets::iter().filter(|path| path.starts_with(folder_path));
 
-        let manifest = project_filess
+        let manifest = project_files
             .find(|path| path.ends_with("ams.yaml"))
             .map((|path| Self::read_from_assets::<SourceManifest>(path.as_ref())))
             .ok_or(ProjectLoadingError::ManifestNotFound)?
             .unwrap();
 
-        let modules: Vec<SourceModuleFragment> = project_filess
+        let modules: Vec<SourceModuleFragment> = project_files
             .filter(|path| !path.ends_with("ams.yaml"))
             .map((|path| Self::read_from_assets::<SourceModuleFragment>(path.as_ref()).unwrap()))
             .collect();
 
-        Ok(SourceProject::new(manifest, modules))
+        let mut project = SourceProject::new(manifest, modules);
+        
+        project.compress_module_fragments();
+        Ok(project)
     }
 
     pub fn from_path<T: AsRef<Path>>(path: T) -> Result<SourceProject, ProjectLoadingError> {
@@ -64,7 +82,7 @@ impl SourceProject {
             .ok_or(ProjectLoadingError::ManifestNotFound)
             .unwrap();
 
-        Ok(SourceProject::new(
+        let mut project = SourceProject::new(
             manifest.unwrap(),
             entries
                 .iter()
@@ -75,7 +93,10 @@ impl SourceProject {
                     }),
                 )
                 .collect(),
-        ))
+        );
+        
+        project.compress_module_fragments();
+        Ok(project)
     }
 
     fn read_from_assets<T: DeserializeOwned>(path: &str) -> Result<T, serde_yaml::Error> {

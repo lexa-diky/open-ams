@@ -23,4 +23,10 @@ impl ModuleDefinitions {
     pub fn types(&self) -> &HashMap<String, SourceTypeDefinition> {
         &self.types
     }
+    
+    pub fn merge_with(&mut self, other: ModuleDefinitions) {
+        self.types.extend(other.types);
+        self.components.extend(other.components);
+        self.events.extend(other.events);
+    }
 }

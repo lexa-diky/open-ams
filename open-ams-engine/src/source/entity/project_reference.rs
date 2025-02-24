@@ -45,7 +45,7 @@ impl ProjectReference {
 pub struct ParseProjectReferenceError;
 
 impl Display for ProjectReference {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let str = match self {
             ProjectReference::CurrentProject => "self".to_string(),
             ProjectReference::External { group, name } => {

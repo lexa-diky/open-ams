@@ -1,14 +1,8 @@
 module: common
-uses:
-  - ams:std/**
 
 definitions:
   types:
     PhoneNumber:
-      type: String
-      pattern: '^\+?[0-9]{1,3}-?[0-9]{1,14}$'
-      example: "+1-541-754-3010"
-    PhoneNumber2:
       type: ams:std/String
       pattern: '^\+?[0-9]{1,3}-?[0-9]{1,14}$'
       example: "+1-541-754-3010"
